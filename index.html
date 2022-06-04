@@ -4,11 +4,72 @@
 		<meta charset="UTF-8" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link
+			href="https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css"
+			rel="stylesheet"
+		/>
 		<link rel="stylesheet" href="./style.css" />
 		<script src="./index.js" defer></script>
 		<title>Project - Library</title>
 	</head>
 	<body>
-		<div class="container"></div>
+		<div id="root">
+			<header class="header">
+				<h1 class="header__title">Another Boring Book Library</h1>
+			</header>
+			<div class="container">
+				<form class="form">
+					<h2 class="form__title">Add A Book</h2>
+					<label for="title" class="form__label">Title</label>
+					<input type="text" id="title" class="form__input" value="" required />
+					<label for="author" class="form__label">Author</label>
+					<input
+						type="text"
+						id="author"
+						class="form__input"
+						value=""
+						required
+					/>
+					<label for="pages" class="form__label">Number of Pages</label>
+					<input
+						type="number"
+						id="pages"
+						class="form__input"
+						value=""
+						required
+					/>
+					<label for="genre" class="form__label">Genre</label>
+					<select class="form__dropdown" name="genre" id="genre" required>
+						<option value="Comedy">Comedy</option>
+						<option value="Drama">Drama</option>
+						<option value="Fantasy">Fantasy</option>
+						<option value="High Fantasy">High Fantasy</option>
+						<option value="Mystery">Mystery</option>
+						<option value="Non-Fiction">Non-Fiction</option>
+						<option value="Romance">Romance</option>
+						<option value="Science Fiction">Science Fiction</option>
+						<option value="Thriller">Thriller</option>
+					</select>
+					<div class="form__checkbox">
+						<label for="read" class="form__label--checkbox"
+							>Have you read it?</label
+						>
+						<input
+							type="checkbox"
+							name="read"
+							id="read"
+							class="form__input--checkbox"
+							value="true"
+						/>
+					</div>
+
+					<button class="form__button" type="submit">Add</button>
+				</form>
+				<ul class="book-list"></ul>
+			</div>
+			<footer class="footer">
+				<p class="footer__copyright">&copy; 2022 Paul Calzado</p>
+			</footer>
+		</div>
 	</body>
 </html>
