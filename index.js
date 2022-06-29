@@ -1,43 +1,46 @@
+const form = document.querySelector('.form');
+const bookList = document.querySelector('.book-list');
+let buttons;
+
 const btnIcon = {
   read: 'SHELVE BOOK',
   notRead: `READ AGAIN`,
   delete: `DELETE`,
 };
 
-const myLibrary = [
-  new Book(
-    'A Game Of Thrones',
-    'George R.R. Martin',
-    'High Fantasy',
-    694,
-    false
-  ),
-  new Book(
-    'The Name Of The Wind',
-    'Patrick Rothfuss',
-    'High Fantasy',
-    662,
-    true
-  ),
-  new Book('The Hunger Games', 'Suzanne Collins', 'Science Fiction', 374, true),
-  new Book('Blood Song', 'Anthony Ryan', 'Fantasy', 591, false),
-];
-
-function Book(title, author, genre, pages, read) {
-  this.title = title;
-  this.author = author;
-  this.genre = genre;
-  this.pages = pages;
-  this.read = read;
+class Book {
+  constructor(title, author, pages, genre, isRead) {
+    this.title = title;
+    this.author = author;
+    this.pages = pages;
+    this.genre = genre;
+    this.isRead = isRead;
+    this.id = crypto.randomUUID();
+  }
 }
 
-function addToBook(obj) {
-  myLibrary.push(obj);
-}
+class BookLibrary {
+  constructor(library) {
+    this.library = library;
+  }
 
-Book.prototype.toggleRead = function () {
-  return !this.read;
-};
+  addToLibrary(obj) {
+    this.library.push(obj);
+  }
+
+  removeFromLibrary(id) {
+    this.library = this.library.filter((book) => book.id !== id);
+  }
+
+  toggleIsRead(id) {
+    this.library = this.library.map((book) => {
+      if (book.id === id) {
+        book.isRead = !book.isRead;
+      }
+      return book;
+    });
+  }
+}
 
 const renderBook = (arr) => {
   if (!arr.length) {
@@ -49,7 +52,7 @@ const renderBook = (arr) => {
     bookList.innerHTML = '';
     arr.map((book, index) => {
       const bookItem = document.createElement('li');
-      const { title, author, genre, pages, read } = book;
+      const { title, author, genre, pages, isRead } = book;
       bookItem.innerHTML = `
 				<div class="book__details">
 				<h2 class="book__title">${title}</h2>
@@ -60,23 +63,23 @@ const renderBook = (arr) => {
 
 				<div class="book__btn-actions">
 				<button class="book__btn book__read-toggle" data-key=${index}>
-					${read ? btnIcon['notRead'] : btnIcon['read']}
+					${isRead ? btnIcon['notRead'] : btnIcon['read']}
 				</button>
 				<button class="book__btn book__delete" data-key=${index}>
 				${btnIcon['delete']}</button>
 				</div>
 			`;
       bookItem.classList.add('book-item');
-      if (read) {
+      if (isRead) {
         bookItem.classList.add('read');
       } else {
         bookItem.classList.remove('read');
       }
       bookList.appendChild(bookItem);
     });
-    addToggleReadListener();
-    addDeleteBookListener();
   }
+  addToggleReadListener();
+  addDeleteBookListener();
 };
 
 const submitFormHandler = (event) => {
@@ -85,10 +88,11 @@ const submitFormHandler = (event) => {
   let author = document.getElementById('author').value;
   let genre = document.getElementById('genre').value;
   let pages = document.getElementById('pages').value;
-  let read = document.getElementById('read').checked ? true : false;
+  let isRead = document.getElementById('read').checked ? true : false;
 
-  addToBook(new Book(title, author, genre, pages, read));
-  renderBook(myLibrary);
+  const book = new Book(title, author, pages, genre, isRead);
+  bookLibrary.addToLibrary(book);
+  renderBook(bookLibrary.library);
 
   form.reset();
 };
@@ -111,8 +115,8 @@ const toggleReadHandler = (event) => {
   const button = event.currentTarget;
   const buttonKey = event.currentTarget.dataset['key'];
 
-  myLibrary[buttonKey].read = myLibrary[buttonKey].toggleRead();
-  if (myLibrary[buttonKey].read) {
+  bookLibrary.toggleIsRead(bookLibrary.library[buttonKey].id);
+  if (bookLibrary.library[buttonKey].isRead) {
     button.innerHTML = btnIcon['notRead'];
     bookList.children[buttonKey].classList.add('read');
   } else {
@@ -123,20 +127,36 @@ const toggleReadHandler = (event) => {
 
 const deleteBookHandler = (event) => {
   const buttonKey = event.currentTarget.dataset['key'];
-  const newArray = myLibrary;
 
-  newArray.splice(buttonKey, 1);
-
-  renderBook(newArray);
+  bookLibrary.removeFromLibrary(bookLibrary.library[buttonKey].id);
+  renderBook(bookLibrary.library);
 };
+
+const bookLibrary = new BookLibrary([
+  new Book('The Hunger Games', 'Suzanne Collins', 374, 'Science Fiction', true),
+  new Book(
+    'A Game Of Thrones',
+    'George R.R. Martin',
+    694,
+    'High Fantasy',
+    false
+  ),
+  new Book(
+    'The Name Of The Wind',
+    'Patrick Rothfuss',
+    662,
+    'High Fantasy',
+    true
+  ),
+]);
 
 form.addEventListener('submit', submitFormHandler);
 
 window.addEventListener('load', function () {
-  if (myLibrary.length > 0) {
-    renderBook(myLibrary);
-    addToggleReadListener(myLibrary);
-    addDeleteBookListener(myLibrary);
+  if (bookLibrary.library.length > 0) {
+    renderBook(bookLibrary.library);
+    addToggleReadListener();
+    addDeleteBookListener();
   }
 
   return;
